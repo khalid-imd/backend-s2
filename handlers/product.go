@@ -10,8 +10,11 @@ import (
 	"strconv"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
 )
+
+var path_file = "http://localhost:5000/uploads/"
 
 type handlerProduct struct {
   ProductRepository repositories.ProductRepository
@@ -32,6 +35,10 @@ func (h *handlerProduct) FindProducts(w http.ResponseWriter, r *http.Request) {
     return
   }
 
+  for i, p := range products {
+  products[i].Image = path_file + p.Image
+}
+
   w.WriteHeader(http.StatusOK)
   response := dto.SuccessResult{Code: http.StatusOK, Data: products}
   json.NewEncoder(w).Encode(response)
@@ -51,6 +58,8 @@ func (h *handlerProduct) GetProduct(w http.ResponseWriter, r *http.Request) {
     return
   }
 
+  product.Image = path_file + product.Image
+
   w.WriteHeader(http.StatusOK)
   response := dto.SuccessResult{Code: http.StatusOK, Data: convertResponseProduct(product)}
   json.NewEncoder(w).Encode(response)
@@ -59,12 +68,17 @@ func (h *handlerProduct) GetProduct(w http.ResponseWriter, r *http.Request) {
 func (h *handlerProduct) CreateProduct(w http.ResponseWriter, r *http.Request) {
   w.Header().Set("Content-Type", "application/json")
 
-  request := new(productdto.ProductRequest)
-  if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-    w.WriteHeader(http.StatusBadRequest)
-    response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
-    json.NewEncoder(w).Encode(response)
-    return
+  userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
+  userId := int(userInfo["id"].(float64))
+
+  dataContex := r.Context().Value("dataFile")
+  filename := dataContex.(string)
+
+  price, _ := strconv.Atoi(r.FormValue("price"))
+  request := productdto.ProductRequest{
+    Title : r.FormValue("title"),
+    Price : price,
+    Image : r.FormValue("image"),
   }
 
   validation := validator.New()
@@ -79,8 +93,8 @@ func (h *handlerProduct) CreateProduct(w http.ResponseWriter, r *http.Request) {
   product := models.Product{
     Title:  request.Title,
     Price:  request.Price,
-    Image:  request.Image,
-    UserID: request.UserID,
+    Image:  filename,
+    UserID: userId,
   }
 
   product, err = h.ProductRepository.CreateProduct(product)

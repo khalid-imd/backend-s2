@@ -44,6 +44,7 @@ func (h *handler) CreateUser(w http.ResponseWriter, r *http.Request) {
   user := models.User{
     Fullname:     request.Fullname,
     Email:    request.Email,
+    Password:    request.Password,
     Phone: request.Phone,
     Location: request.Location,
     Image: request.Image,
@@ -66,6 +67,7 @@ func convertResponse(u models.User) usersdto.UserResponse {
     ID:       u.ID,
     Fullname: u.Fullname,
     Email: u.Email,
+    Password: u.Password,
     Phone: u.Phone,
     Location: u.Location,
     Image: u.Image,

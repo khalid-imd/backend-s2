@@ -24,21 +24,21 @@ func RepositoryUser(db *gorm.DB) *repository {
 }
 
 func (r *repository) CreateUser(user models.User) (models.User, error) {
-  err := r.db.Exec("INSERT INTO users(fullname,email,phone,location,image,role,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?)",user.Fullname,user.Email, user.Phone, user.Location, user.Image, user.Role, time.Now(), time.Now()).Error
+  err := r.db.Exec("INSERT INTO users(fullname,email,password,phone,location,image,role,created_at,updated_at) VALUES (?,?,?,?,?,?,?,?,?)",user.Fullname,user.Email, user.Password, user.Phone, user.Location, user.Image, user.Role, time.Now(), time.Now()).Error
 
   return user, err
 }
 
 func (r *repository) FindUsers() ([]models.User, error) {
   var users []models.User
-  err := r.db.Preload("Profile").Find(&users).Error
+  err := r.db.Find(&users).Error
 
   return users, err
 }
 
 func (r *repository) GetUser(ID int) (models.User, error) {
   var user models.User
-  err := r.db.Preload("Profile").First(&user, ID).Error // add this code
+  err := r.db.First(&user, ID).Error // add this code
 
   return user, err
 }

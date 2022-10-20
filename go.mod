@@ -18,3 +18,8 @@ require (
 	gorm.io/driver/mysql v1.4.3
 	gorm.io/gorm v1.24.0
 )
+
+require (
+	github.com/golang-jwt/jwt/v4 v4.4.2 // indirect
+	github.com/joho/godotenv v1.4.0 // indirect
+)
