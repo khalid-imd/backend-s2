@@ -1,8 +1,9 @@
 package dto
 
 type SuccessResult struct {
-	Code int         `json:"code"`
-	Data interface{} `json:"data"`
+	Status string      `json:"status"`
+	Code   int         `json:"code"`
+	Data   interface{} `json:"data"`
 }
 
 type ErrorResult struct {
